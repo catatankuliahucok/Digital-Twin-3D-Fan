@@ -1,0 +1,6 @@
+{
+  "name": "Simulasi Kipas Angin 3D",
+  "description": "Simulasi interaktif kipas angin 3D menggunakan Babylon.js dengan kontrol kecepatan real-time, drag-and-drop, osilasi, kustomisasi baling-baling, dan efek angin dinamis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
