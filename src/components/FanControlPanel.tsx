@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { motion, useAnimation } from 'motion/react';
 import MqttPanel from './MqttPanel';
+import HardwareHub from './HardwareHub';
+import { MqttConfig } from '../types';
 
 interface FanControlPanelProps {
   fanState: FanState;
@@ -24,7 +26,14 @@ interface FanControlPanelProps {
 }
 
 export default function FanControlPanel({ fanState, onStateChange }: FanControlPanelProps) {
-  const [activeTab, setActiveTab] = useState<'controls' | 'mqtt'>('controls');
+  const [activeTab, setActiveTab] = useState<'controls' | 'mqtt' | 'hardware'>('controls');
+  const [mqttConfig, setMqttConfig] = useState<MqttConfig>({
+    brokerUrl: 'mqtt://broker.emqx.io:1883',
+    clientId: 'digital-twin-fan-' + Math.floor(Math.random() * 10000),
+    telemetryTopic: 'industrial/fan/1/telemetry',
+    controlTopic: 'industrial/fan/1/control',
+    publishInterval: 2, // 2 seconds
+  });
   const dialRef = useRef<HTMLDivElement>(null);
   const [isDraggingDial, setIsDraggingDial] = useState(false);
   const [isDraggingCord, setIsDraggingCord] = useState(false);
@@ -224,7 +233,7 @@ export default function FanControlPanel({ fanState, onStateChange }: FanControlP
               : 'border-transparent text-white/40 hover:text-white/80'
           }`}
         >
-          ⚙️ Control Deck
+          ⚙️ Controls
         </button>
         <button
           id="tab-mqtt"
@@ -235,7 +244,18 @@ export default function FanControlPanel({ fanState, onStateChange }: FanControlP
               : 'border-transparent text-white/40 hover:text-white/80'
           }`}
         >
-          🌐 MQTT Digital Twin
+          🌐 MQTT Twin
+        </button>
+        <button
+          id="tab-hardware"
+          onClick={() => setActiveTab('hardware')}
+          className={`flex-1 py-3 text-center font-mono text-[10px] uppercase tracking-[0.2em] font-bold border-b-2 transition-all cursor-pointer ${
+            activeTab === 'hardware'
+              ? 'border-orange-500 text-orange-500 bg-orange-500/5'
+              : 'border-transparent text-white/40 hover:text-white/80'
+          }`}
+        >
+          🔌 HW Link
         </button>
       </div>
 
@@ -580,8 +600,20 @@ export default function FanControlPanel({ fanState, onStateChange }: FanControlP
               </button>
             </div>
           </>
+        ) : activeTab === 'mqtt' ? (
+          <MqttPanel 
+            fanState={fanState} 
+            onStateChange={onStateChange} 
+            config={mqttConfig} 
+            onConfigChange={setMqttConfig} 
+          />
         ) : (
-          <MqttPanel fanState={fanState} onStateChange={onStateChange} />
+          <HardwareHub 
+            fanState={fanState} 
+            mqttTelemetryTopic={mqttConfig.telemetryTopic}
+            mqttControlTopic={mqttConfig.controlTopic}
+            mqttBrokerUrl={mqttConfig.brokerUrl}
+          />
         )}
       </div>
 

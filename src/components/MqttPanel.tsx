@@ -20,18 +20,11 @@ import {
 interface MqttPanelProps {
   fanState: FanState;
   onStateChange: (updates: Partial<FanState>) => void;
+  config: MqttConfig;
+  onConfigChange: (newConfig: MqttConfig) => void;
 }
 
-export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
-  // MQTT Config States
-  const [config, setConfig] = useState<MqttConfig>({
-    brokerUrl: 'mqtt://broker.emqx.io:1883',
-    clientId: 'digital-twin-fan-' + Math.floor(Math.random() * 10000),
-    telemetryTopic: 'industrial/fan/1/telemetry',
-    controlTopic: 'industrial/fan/1/control',
-    publishInterval: 2, // 2 seconds
-  });
-
+export default function MqttPanel({ fanState, onStateChange, config, onConfigChange }: MqttPanelProps) {
   const [isEditingConfig, setIsEditingConfig] = useState(false);
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected'>('disconnected');
   const [logs, setLogs] = useState<MqttMessageLog[]>([]);
@@ -283,7 +276,7 @@ export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
               <input
                 type="text"
                 value={config.brokerUrl}
-                onChange={(e) => setConfig({ ...config, brokerUrl: e.target.value })}
+                onChange={(e) => onConfigChange({ ...config, brokerUrl: e.target.value })}
                 className="w-full px-2 py-1 bg-black border border-white/10 rounded text-orange-400 focus:outline-none focus:border-orange-500 text-[11px]"
               />
             </div>
@@ -293,7 +286,7 @@ export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
                 <input
                   type="text"
                   value={config.clientId}
-                  onChange={(e) => setConfig({ ...config, clientId: e.target.value })}
+                  onChange={(e) => onConfigChange({ ...config, clientId: e.target.value })}
                   className="w-full px-2 py-1 bg-black border border-white/10 rounded text-slate-300 focus:outline-none text-[10px]"
                 />
               </div>
@@ -304,7 +297,7 @@ export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
                   min="1"
                   max="30"
                   value={config.publishInterval}
-                  onChange={(e) => setConfig({ ...config, publishInterval: Math.max(1, parseInt(e.target.value) || 2) })}
+                  onChange={(e) => onConfigChange({ ...config, publishInterval: Math.max(1, parseInt(e.target.value) || 2) })}
                   className="w-full px-2 py-1 bg-black border border-white/10 rounded text-slate-300 focus:outline-none text-[10px]"
                 />
               </div>
@@ -315,7 +308,7 @@ export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
                 <input
                   type="text"
                   value={config.telemetryTopic}
-                  onChange={(e) => setConfig({ ...config, telemetryTopic: e.target.value })}
+                  onChange={(e) => onConfigChange({ ...config, telemetryTopic: e.target.value })}
                   className="w-full px-2 py-1 bg-black border border-white/10 rounded text-slate-300 focus:outline-none text-[9px]"
                 />
               </div>
@@ -324,7 +317,7 @@ export default function MqttPanel({ fanState, onStateChange }: MqttPanelProps) {
                 <input
                   type="text"
                   value={config.controlTopic}
-                  onChange={(e) => setConfig({ ...config, controlTopic: e.target.value })}
+                  onChange={(e) => onConfigChange({ ...config, controlTopic: e.target.value })}
                   className="w-full px-2 py-1 bg-black border border-white/10 rounded text-slate-300 focus:outline-none text-[9px]"
                 />
               </div>
